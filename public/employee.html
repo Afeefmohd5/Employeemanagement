@@ -157,7 +157,7 @@ let lastUpdateCount = 0; // To check if new updates arrived
 // Load all updates
 async function loadUpdates(autoScroll = true) {
     try {
-        const res = await fetch("https://employeemanagement-production-721b.up.railway.app/");
+        const res = await fetch("https://employeemanagement-production-721b.up.railway.app");
         const data = await res.json();
 
         const container = document.getElementById("updatesContainer");
@@ -185,7 +185,7 @@ async function loadUpdates(autoScroll = true) {
             if (update.files && update.files.length > 0) {
                 update.files.forEach(file => {
                     const link = document.createElement("a");
-                    link.href = "https://employeemanagement-production-721b.up.railway.app/" + file.filename;
+                    link.href = "https://employeemanagement-production-721b.up.railway.app" + file.filename;
                     link.textContent = file.originalName;
                     link.className = "file-link";
                     link.download = file.originalName;
@@ -216,7 +216,7 @@ async function submitResponse() {
     if (!name) return alert("Please enter your name.");
 
     try {
-        const res = await fetch("https://employeemanagement-production-721b.up.railway.app/", {
+        const res = await fetch("https://employeemanagement-production-721b.up.railway.app", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ name, status, doubt })

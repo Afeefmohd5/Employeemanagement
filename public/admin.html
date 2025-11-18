@@ -116,7 +116,7 @@ async function postFullUpdate() {
     if (!update.trim()) return alert("Update text required");
 
     // First: Update the text content
-    let updateRes = await fetch("https://employeemanagement-production-721b.up.railway.app/", {
+    let updateRes = await fetch("https://employeemanagement-production-721b.up.railway.app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password, update })
@@ -130,7 +130,7 @@ async function postFullUpdate() {
         formData.append("file", file);
         formData.append("password", password);
 
-        await fetch("https://employeemanagement-production-721b.up.railway.app/", {
+        await fetch("https://employeemanagement-production-721b.up.railway.app", {
             method: "POST",
             body: formData
         });
@@ -146,7 +146,7 @@ async function postFullUpdate() {
 function loadResponses() {
     const password = document.getElementById("password").value;
 
-    fetch("https://employeemanagement-production-721b.up.railway.app/", {
+    fetch("https://employeemanagement-production-721b.up.railway.app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password })
