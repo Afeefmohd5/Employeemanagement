@@ -2,251 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Employee Update</title>
+<title>Employee Updates</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #0d0d0d;
-        color: white;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .main-container {
-        display: flex;
-        height: 100vh;
-        gap: 20px;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-
-    /* LEFT COLUMN: UPDATES */
-    .updates-column {
-        flex: 1;
-        background: #1a1a1a;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 0 25px rgba(0,0,0,0.35);
-        overflow-y: auto;
-        border: 1px solid #333;
-    }
-
-    .update-card {
-        background: #262626;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border-left: 4px solid #007bff;
-    }
-
-    .update-title {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #fff;
-    }
-
-    .update-text {
-        font-size: 15px;
-        color: #e0e0e0;
-        margin-bottom: 10px;
-    }
-
-    .file-link {
-        display: block;
-        padding: 8px;
-        background: #2d2d2d;
-        border-radius: 6px;
-        margin-top: 5px;
-        text-decoration: none;
-        color: #6ca8ff;
-        border: 1px solid #444;
-        font-size: 14px;
-    }
-
-    .file-link:hover {
-        background: #3a3a3a;
-    }
-
-    /* RIGHT COLUMN: RESPONSE FORM */
-    .form-column {
-        flex: 1;
-        background: #1a1a1a;
-        border-radius: 14px;
-        padding: 25px;
-        box-shadow: 0 0 25px rgba(0,0,0,0.35);
-        border: 1px solid #333;
-        overflow-y: auto;
-        max-height: 100vh;
-    }
-
-    label {
-        color: #ccc;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    input, select, textarea {
-        width: 100%;
-        padding: 12px;
-        margin-top: 8px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        background: #262626;
-        color: #fff;
-        border: 1px solid #444;
-        font-size: 15px;
-    }
-
-    textarea { height: 100px; }
-
-    button {
-        padding: 12px;
-        border-radius: 8px;
-        border: none;
-        font-size: 16px;
-        cursor: pointer;
-        background: #007bff;
-        color: white;
-        width: 100%;
-    }
-
-    button:hover {
-        background: #0056b3;
-    }
-
-    #message {
-        margin-top: 10px;
-        font-weight: bold;
-        font-size: 15px;
-    }
+body { font-family: Arial; margin:0; padding:0; background:#0d0d0d; color:white; height:100vh; overflow:hidden; }
+.main-container { display:flex; height:100vh; gap:20px; padding:20px; box-sizing:border-box; }
+.updates-column { flex:1; background:#1a1a1a; border-radius:14px; padding:20px; overflow-y:auto; border:1px solid #333; box-shadow:0 0 25px rgba(0,0,0,0.35); }
+.update-card { background:#262626; padding:15px; border-radius:10px; margin-bottom:20px; border-left:4px solid #007bff; }
+.update-title { font-size:20px; font-weight:bold; margin-bottom:10px; color:#fff; }
+.update-text { font-size:15px; color:#e0e0e0; margin-bottom:10px; }
+.file-link { display:block; padding:8px; background:#2d2d2d; border-radius:6px; margin-top:5px; text-decoration:none; color:#6ca8ff; border:1px solid #444; font-size:14px; }
+.file-link:hover { background:#3a3a3a; }
+.form-column { flex:1; background:#1a1a1a; border-radius:14px; padding:25px; box-shadow:0 0 25px rgba(0,0,0,0.35); border:1px solid #333; overflow-y:auto; max-height:100vh; }
+label { color:#ccc; font-size:14px; font-weight:bold; }
+input, select, textarea { width:100%; padding:12px; margin-top:8px; margin-bottom:20px; border-radius:8px; background:#262626; color:#fff; border:1px solid #444; font-size:15px; }
+textarea { height:100px; }
+button { padding:12px; border-radius:8px; border:none; font-size:16px; cursor:pointer; background:#007bff; color:white; width:100%; }
+button:hover { background:#0056b3; }
+#message { margin-top:10px; font-weight:bold; font-size:15px; }
 </style>
 </head>
 <body>
-
 <div class="main-container">
+  <div class="updates-column" id="updatesContainer">
+    <p style="color:#888;">Loading updates...</p>
+  </div>
 
-    <!-- LEFT COLUMN: UPDATES -->
-    <div class="updates-column" id="updatesContainer">
-        <p style="color:#888;">Loading updates...</p>
-    </div>
-
-    <!-- RIGHT COLUMN: RESPONSE FORM -->
-    <div class="form-column">
-        <h3 style="color:white; margin-bottom:20px;">Submit Your Response</h3>
-        <label>Your Name</label>
-        <input type="text" id="name" placeholder="Enter your name">
-        <label>Status</label>
-        <select id="status">
-            <option value="Understood no doubts further">Understood no doubts further</option>
-            <option value="Doubt">Doubt</option>
-        </select>
-        <label>Your Doubt (if any)</label>
-        <textarea id="doubt" placeholder="Write your doubt..."></textarea>
-        <button onclick="submitResponse()">Submit Response</button>
-        <p id="message"></p>
-    </div>
-
+  <div class="form-column">
+    <h3 style="color:white; margin-bottom:20px;">Submit Your Response</h3>
+    <label>Your Name</label>
+    <input type="text" id="name" placeholder="Enter your name">
+    <label>Status</label>
+    <select id="status">
+      <option value="Understood no doubts further">Understood no doubts further</option>
+      <option value="Doubt">Doubt</option>
+    </select>
+    <label>Your Doubt (if any)</label>
+    <textarea id="doubt" placeholder="Write your doubt..."></textarea>
+    <button onclick="submitResponse()">Submit Response</button>
+    <p id="message"></p>
+  </div>
 </div>
 
 <script>
-let lastUpdateCount = 0; // To check if new updates arrived
+let lastUpdateCount = 0;
 
-// Load all updates
-async function loadUpdates(autoScroll = true) {
-    try {
-        const res = await fetch("https://employeemanagement-production-721b.up.railway.app/updates");
-        const data = await res.json();
-
-        const container = document.getElementById("updatesContainer");
-        container.innerHTML = "";
-
-        if (!data.updates || data.updates.length === 0) {
-            container.innerHTML = "<p style='color:#888;'>No updates posted yet.</p>";
-            return;
-        }
-
-        data.updates.forEach((update, idx) => {
-            const card = document.createElement("div");
-            card.className = "update-card";
-
-            const title = document.createElement("div");
-            title.className = "update-title";
-            title.textContent = `Update #${idx+1}`;
-            card.appendChild(title);
-
-            const text = document.createElement("div");
-            text.className = "update-text";
-            text.textContent = update.text;
-            card.appendChild(text);
-
-            // ✅ Correct file link
-            if (update.files && update.files.length > 0) {
-                update.files.forEach(file => {
-                    const link = document.createElement("a");
-                    link.href = "https://employeemanagement-production-721b.up.railway.app/uploads/" + file.filename;
-                    link.textContent = file.originalName;
-                    link.className = "file-link";
-                    link.download = file.originalName;
-                    card.appendChild(link);
-                });
-            }
-
-            container.appendChild(card);
-        });
-
-        if (autoScroll && data.updates.length > lastUpdateCount) {
-            container.scrollTop = container.scrollHeight;
-        }
-        lastUpdateCount = data.updates.length;
-
-    } catch (err) {
-        console.error(err);
+async function loadUpdates(autoScroll=true){
+  try{
+    const res = await fetch("/updates");
+    const data = await res.json();
+    const container = document.getElementById("updatesContainer");
+    container.innerHTML = "";
+    if(!data.updates || data.updates.length===0){
+      container.innerHTML = "<p style='color:#888;'>No updates posted yet.</p>"; return;
     }
+    data.updates.forEach((update, idx)=>{
+      const card = document.createElement("div"); card.className="update-card";
+      const title = document.createElement("div"); title.className="update-title"; title.textContent=`Update #${idx+1}`; card.appendChild(title);
+      const text = document.createElement("div"); text.className="update-text"; text.textContent=update.text; card.appendChild(text);
+      if(update.files && update.files.length>0){
+        update.files.forEach(file=>{
+          const link=document.createElement("a");
+          link.href="/uploads/"+file.filename; link.textContent=file.originalName; link.className="file-link"; link.download=file.originalName;
+          card.appendChild(link);
+        });
+      }
+      container.appendChild(card);
+    });
+    if(autoScroll && data.updates.length>lastUpdateCount) container.scrollTop=container.scrollHeight;
+    lastUpdateCount=data.updates.length;
+  } catch(err){ console.error(err); }
 }
 
-// Submit employee response
-async function submitResponse() {
-    const name = document.getElementById("name").value.trim();
-    const status = document.getElementById("status").value;
-    const doubt = document.getElementById("doubt").value.trim();
-
-    if (!name) return alert("Please enter your name.");
-
-    try {
-        const res = await fetch("https://employeemanagement-production-721b.up.railway.app/submit", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ name, status, doubt })
-        });
-        const data = await res.json();
-
-        const message = document.getElementById("message");
-        if (data.success) {
-            message.textContent = "Response submitted!";
-            message.style.color = "lightgreen";
-            document.getElementById("name").value = "";
-            document.getElementById("doubt").value = "";
-        } else {
-            message.textContent = data.message || "Error submitting.";
-            message.style.color = "red";
-        }
-    } catch(err) {
-        console.error(err);
-    }
+async function submitResponse(){
+  const name=document.getElementById("name").value.trim();
+  const status=document.getElementById("status").value;
+  const doubt=document.getElementById("doubt").value.trim();
+  if(!name) return alert("Please enter your name.");
+  try{
+    const res=await fetch("/submit",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,status,doubt}) });
+    const data=await res.json();
+    const message=document.getElementById("message");
+    if(data.success){ message.textContent="Response submitted!"; message.style.color="lightgreen"; document.getElementById("name").value=""; document.getElementById("doubt").value=""; }
+    else{ message.textContent=data.message||"Error submitting."; message.style.color="red"; }
+  } catch(err){ console.error(err); }
 }
 
-// Initial load
 loadUpdates();
-
-// Auto-refresh every 5 seconds
-setInterval(() => {
-    loadUpdates();
-}, 5000);
-
+setInterval(()=>{ loadUpdates(); },5000);
 </script>
-
 </body>
 </html>

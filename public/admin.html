@@ -1,183 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #0d0d0d;
-            color: white;
-            margin: 0;
-            padding: 30px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: #1a1a1a;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
-        }
-
-        h2, h3 {
-            color: #ffffff;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-
-        input, textarea, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 6px;
-            border: 1px solid #333;
-            background: #262626;
-            color: white;
-            font-size: 14px;
-        }
-
-        button {
-            background: #007bff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-        }
-
-        th, td {
-            border: 1px solid #444;
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: #111;
-        }
-
-        tr:nth-child(even) {
-            background: #222;
-        }
-
-        tr:nth-child(odd) {
-            background: #1a1a1a;
-        }
-
-        .fileBox {
-            margin-top: 10px;
-            background: #111;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<style>
+body { font-family: Arial; background:#0d0d0d; color:white; margin:0; padding:30px; }
+.container { max-width:900px; margin:auto; background:#1a1a1a; padding:25px; border-radius:10px; box-shadow:0 0 20px rgba(255,255,255,0.05); }
+h2,h3 { color:#fff; border-bottom:1px solid #333; padding-bottom:10px; }
+input,textarea,button{ width:100%; padding:12px; margin-top:12px; border-radius:6px; border:1px solid #333; background:#262626; color:white; font-size:14px; }
+button{ background:#007bff; border:none; cursor:pointer; font-weight:bold; }
+button:hover{ background:#0056b3; }
+table{ width:100%; border-collapse:collapse; margin-top:25px; }
+th,td{ border:1px solid #444; padding:12px; text-align:left; }
+th{ background:#111; }
+tr:nth-child(even){ background:#222; }
+tr:nth-child(odd){ background:#1a1a1a; }
+</style>
 </head>
-
 <body>
-
 <div class="container">
+<h2>Admin Panel</h2>
+<input id="password" type="password" placeholder="Enter Admin Password">
 
-    <h2>Admin Panel</h2>
+<h3>Post Today's Update (Text + Files Together)</h3>
+<textarea id="updateBox" placeholder="Type today's update..." rows="5"></textarea>
+<label style="margin-top:15px;">Attach Files</label>
+<input type="file" id="fileInput" multiple>
+<button onclick="postFullUpdate()">Post Update With Files</button>
 
-    <input id="password" type="password" placeholder="Enter Admin Password">
-
-    <h3>Post Today's Update (Text + Files Together)</h3>
-
-    <textarea id="updateBox" placeholder="Type today's update..." rows="5"></textarea>
-
-    <label style="margin-top:15px;">Attach Files</label>
-    <input type="file" id="fileInput" multiple>
-
-    <button onclick="postFullUpdate()">Post Update With Files</button>
-
-    <h3>Employee Responses</h3>
-    <button onclick="loadResponses()">Load Responses</button>
-
-    <table id="table"></table>
-
+<h3>Employee Responses</h3>
+<button onclick="loadResponses()">Load Responses</button>
+<table id="table"></table>
 </div>
 
 <script>
-async function postFullUpdate() {
-    const password = document.getElementById("password").value.trim();
-    const update = document.getElementById("updateBox").value.trim();
-    const files = document.getElementById("fileInput").files;
+async function postFullUpdate(){
+  const password=document.getElementById("password").value.trim();
+  const update=document.getElementById("updateBox").value.trim();
+  const files=document.getElementById("fileInput").files;
+  if(!password) return alert("Enter admin password");
+  if(!update) return alert("Update text required");
 
-    if (!password) return alert("Enter admin password");
-    if (!update) return alert("Update text required");
+  const updateRes=await fetch("/update",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({password,update}) }).then(r=>r.json());
+  if(!updateRes.success) return alert(updateRes.message || "Wrong password or update failed!");
 
-    // POST text update
-    const updateRes = await fetch("https://employeemanagement-production-721b.up.railway.app/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, update })
-    }).then(r => r.json());
+  for(let file of files){
+    const formData=new FormData();
+    formData.append("file",file);
+    formData.append("password",password);
+    await fetch("/upload",{ method:"POST", body:formData }).then(r=>r.json());
+  }
 
-    if (!updateRes.success) return alert(updateRes.message || "Wrong password or update failed!");
-
-    // Upload files one by one
-    for (let file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("password", password);
-
-        await fetch("https://employeemanagement-production-721b.up.railway.app/upload", {
-            method: "POST",
-            body: formData
-        }).then(r => r.json());
-    }
-
-    alert("Update & Files Posted Successfully!");
-    document.getElementById("updateBox").value = "";
-    document.getElementById("fileInput").value = "";
+  alert("Update & Files Posted Successfully!");
+  document.getElementById("updateBox").value="";
+  document.getElementById("fileInput").value="";
 }
 
-async function loadResponses() {
-    const password = document.getElementById("password").value.trim();
-    if (!password) return alert("Enter admin password");
+async function loadResponses(){
+  const password=document.getElementById("password").value.trim();
+  if(!password) return alert("Enter admin password");
 
-    const res = await fetch("https://employeemanagement-production-721b.up.railway.app/admin/data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password })
-    });
+  const res=await fetch("/admin/data",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({password}) });
+  const data=await res.json();
+  if(!data.success) return alert(data.message || "Wrong password!");
 
-    const data = await res.json();
-
-    if (!data.success) return alert(data.message || "Wrong password!");
-
-    let html = `
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Doubt</th>
-            <th>Time</th>
-        </tr>
-    `;
-
-    data.data.responses.forEach(r => {
-        html += `
-            <tr>
-                <td>${r.name}</td>
-                <td>${r.status}</td>
-                <td>${r.doubt || "-"}</td>
-                <td>${r.time}</td>
-            </tr>
-        `;
-    });
-
-    document.getElementById("table").innerHTML = html;
+  let html=`<tr><th>Name</th><th>Status</th><th>Doubt</th><th>Time</th></tr>`;
+  data.data.responses.forEach(r=>{
+    html+=`<tr><td>${r.name}</td><td>${r.status}</td><td>${r.doubt||"-"}</td><td>${r.time}</td></tr>`;
+  });
+  document.getElementById("table").innerHTML=html;
 }
 </script>
-
 </body>
 </html>
