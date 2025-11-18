@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0d0d0d;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        h2, h3 {
+            color: #ffffff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #262626;
+            color: white;
+            font-size: 14px;
+        }
+
+        button {
+            background: #007bff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #111;
+        }
+
+        tr:nth-child(even) {
+            background: #222;
+        }
+
+        tr:nth-child(odd) {
+            background: #1a1a1a;
+        }
+
+        .fileBox {
+            margin-top: 10px;
+            background: #111;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Admin Panel</h2>
+
+    <input id="password" type="password" placeholder="Enter Admin Password">
+
+    <h3>Post Today's Update (Text + Files Together)</h3>
+
+    <textarea id="updateBox" placeholder="Type today's update..." rows="5"></textarea>
+
+    <label style="margin-top:15px;">Attach Files</label>
+    <input type="file" id="fileInput" multiple>
+
+    <button onclick="postFullUpdate()">Post Update With Files</button>
+
+    <h3>Employee Responses</h3>
+    <button onclick="loadResponses()">Load Responses</button>
+
+    <table id="table"></table>
+
+</div>
+
+<script>
+async function postFullUpdate() {
+    const password = document.getElementById("password").value;
+    const update = document.getElementById("updateBox").value;
+    const files = document.getElementById("fileInput").files;
+
+    if (!password) return alert("Enter admin password");
+    if (!update.trim()) return alert("Update text required");
+
+    // First: Update the text content
+    let updateRes = await fetch("http://localhost:3000/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, update })
+    }).then(r => r.json());
+
+    if (!updateRes.success) return alert("Wrong password!");
+
+    // Second: Upload all files one by one
+    for (let file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("password", password);
+
+        await fetch("http://localhost:3000/upload", {
+            method: "POST",
+            body: formData
+        });
+    }
+
+    alert("Update & Files Posted Successfully!");
+    document.getElementById("updateBox").value = "";
+    document.getElementById("fileInput").value = "";
+}
+
+
+
+function loadResponses() {
+    const password = document.getElementById("password").value;
+
+    fetch("http://localhost:3000/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) return alert("Wrong password!");
+
+        let html = `
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Doubt</th>
+                <th>Time</th>
+            </tr>
+        `;
+
+        data.data.responses.forEach(r => {
+            html += `
+                <tr>
+                    <td>${r.name}</td>
+                    <td>${r.status}</td>
+                    <td>${r.doubt || "-"}</td>
+                    <td>${r.time}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById("table").innerHTML = html;
+    });
+}
+</script>
+
+</body>
+</html>
