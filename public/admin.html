@@ -108,32 +108,32 @@
 
 <script>
 async function postFullUpdate() {
-    const password = document.getElementById("password").value;
-    const update = document.getElementById("updateBox").value;
+    const password = document.getElementById("password").value.trim();
+    const update = document.getElementById("updateBox").value.trim();
     const files = document.getElementById("fileInput").files;
 
     if (!password) return alert("Enter admin password");
-    if (!update.trim()) return alert("Update text required");
+    if (!update) return alert("Update text required");
 
-    // First: Update the text content
-    let updateRes = await fetch("https://employeemanagement-production-721b.up.railway.app", {
+    // POST text update
+    const updateRes = await fetch("https://employeemanagement-production-721b.up.railway.app/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password, update })
     }).then(r => r.json());
 
-    if (!updateRes.success) return alert("Wrong password!");
+    if (!updateRes.success) return alert(updateRes.message || "Wrong password or update failed!");
 
-    // Second: Upload all files one by one
+    // Upload files one by one
     for (let file of files) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("password", password);
 
-        await fetch("https://employeemanagement-production-721b.up.railway.app", {
+        await fetch("https://employeemanagement-production-721b.up.railway.app/upload", {
             method: "POST",
             body: formData
-        });
+        }).then(r => r.json());
     }
 
     alert("Update & Files Posted Successfully!");
@@ -141,42 +141,41 @@ async function postFullUpdate() {
     document.getElementById("fileInput").value = "";
 }
 
+async function loadResponses() {
+    const password = document.getElementById("password").value.trim();
+    if (!password) return alert("Enter admin password");
 
-
-function loadResponses() {
-    const password = document.getElementById("password").value;
-
-    fetch("https://employeemanagement-production-721b.up.railway.app", {
+    const res = await fetch("https://employeemanagement-production-721b.up.railway.app/admin/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.success) return alert("Wrong password!");
+    });
 
-        let html = `
+    const data = await res.json();
+
+    if (!data.success) return alert(data.message || "Wrong password!");
+
+    let html = `
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Doubt</th>
+            <th>Time</th>
+        </tr>
+    `;
+
+    data.data.responses.forEach(r => {
+        html += `
             <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Doubt</th>
-                <th>Time</th>
+                <td>${r.name}</td>
+                <td>${r.status}</td>
+                <td>${r.doubt || "-"}</td>
+                <td>${r.time}</td>
             </tr>
         `;
-
-        data.data.responses.forEach(r => {
-            html += `
-                <tr>
-                    <td>${r.name}</td>
-                    <td>${r.status}</td>
-                    <td>${r.doubt || "-"}</td>
-                    <td>${r.time}</td>
-                </tr>
-            `;
-        });
-
-        document.getElementById("table").innerHTML = html;
     });
+
+    document.getElementById("table").innerHTML = html;
 }
 </script>
 
